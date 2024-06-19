@@ -1,0 +1,41 @@
+version: "3.4"
+
+services:
+  weaviate:
+    command:
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8080"
+      - --scheme
+      - http
+    image: cr.weaviate.io/semitechnologies/weaviate:1.24.10
+    deploy:
+      resources:
+        limits:
+          cpus: "0.75"
+          memory: 2.5G
+        reservations:
+          cpus: "0.5"
+          memory: 1G
+    ports:
+      - 8080:8080
+      - 50051:50051
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+    restart: on-failure:0
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "false"
+      AUTHENTICATION_APIKEY_ENABLED: "true"
+      AUTHENTICATION_APIKEY_ALLOWED_KEYS: "4MSRfFdFKXkVtn0oFz5cAyKIQ83slQp2Ie8q"
+      AUTHENTICATION_APIKEY_USERS: "daniel.t@aai-labs.com"
+      PERSISTENCE_DATA_PATH: "/var/lib/weaviate"
+      ENABLE_MODULES: text2vec-huggingface
+      DEFAULT_VECTORIZER_MODULE: text2vec-huggingface
+      HUGGINGFACE_APIKEY: "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"
+      CLUSTER_HOSTNAME: "node1"
+      LIMIT_RESOURCES: "true"
+
+volumes:
+  weaviate_data:

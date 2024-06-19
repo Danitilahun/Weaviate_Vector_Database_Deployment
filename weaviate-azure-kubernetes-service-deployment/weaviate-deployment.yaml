@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weaviate
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: weaviate
+  template:
+    metadata:
+      labels:
+        app: weaviate
+    spec:
+      containers:
+        - name: weaviate
+          image: cr.weaviate.io/semitechnologies/weaviate:1.24.10
+          ports:
+            - containerPort: 8080
+            - containerPort: 50051
+          env:
+            - name: QUERY_DEFAULTS_LIMIT
+              valueFrom:
+                configMapKeyRef:
+                  name: weaviate-config
+                  key: QUERY_DEFAULTS_LIMIT
+
+            - name: AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: weaviate-config
+                  key: AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED
+
+            - name: AUTHENTICATION_APIKEY_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: weaviate-config
+                  key: AUTHENTICATION_APIKEY_ENABLED
+
+            - name: AUTHENTICATION_APIKEY_ALLOWED_KEYS
+              valueFrom:
+                secretKeyRef:
+                  name: weaviate-secret
+                  key: AUTHENTICATION_APIKEY_ALLOWED_KEYS
+
+            - name: AUTHENTICATION_APIKEY_USERS
+              valueFrom:
+                secretKeyRef:
+                  name: weaviate-secret
+                  key: AUTHENTICATION_APIKEY_USERS
+
+            - name: PERSISTENCE_DATA_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: weaviate-config
+                  key: PERSISTENCE_DATA_PATH
+
+            - name: ENABLE_MODULES
+              valueFrom:
+                configMapKeyRef:
+                  name: weaviate-config
+                  key: ENABLE_MODULES
+
+            - name: DEFAULT_VECTORIZER_MODULE
+              valueFrom:
+                configMapKeyRef:
+                  name: weaviate-config
+                  key: DEFAULT_VECTORIZER_MODULE
+
+            - name: HUGGINGFACE_APIKEY
+              valueFrom:
+                secretKeyRef:
+                  name: weaviate-secret
+                  key: HUGGINGFACE_APIKEY
+
+            - name: CLUSTER_HOSTNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: weaviate-config
+                  key: CLUSTER_HOSTNAME
+
+            - name: LIMIT_RESOURCES
+              valueFrom:
+                configMapKeyRef:
+                  name: weaviate-config
+                  key: LIMIT_RESOURCES
+
+          resources:
+            limits:
+              cpu: "750m"
+              memory: "2500Mi"
+            requests:
+              cpu: "500m"
+              memory: "1000Mi"
+          volumeMounts:
+            - name: weaviate-data
+              mountPath: /var/lib/weaviate
+      volumes:
+        - name: weaviate-data
+          persistentVolumeClaim:
+            claimName: weaviate-pvc

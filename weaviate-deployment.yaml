@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weaviate
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: weaviate
+  template:
+    metadata:
+      labels:
+        app: weaviate
+    spec:
+      containers:
+        - name: weaviate
+          image: cr.weaviate.io/semitechnologies/weaviate:1.24.10
+          ports:
+            - containerPort: 8080
+            - containerPort: 50051
+          env:
+            - name: QUERY_DEFAULTS_LIMIT
+              value: "25"
+            - name: AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED
+              value: "false"
+            - name: AUTHENTICATION_APIKEY_ENABLED
+              value: "true"
+            - name: AUTHENTICATION_APIKEY_ALLOWED_KEYS
+              value: "4MSRfFdFKXkVtn0oFz5cAyKIQ83slQp2Ie8q"
+            - name: AUTHENTICATION_APIKEY_USERS
+              value: "daniel.t@aai-labs.com"
+            - name: PERSISTENCE_DATA_PATH
+              value: "/var/lib/weaviate"
+            - name: ENABLE_MODULES
+              value: "text2vec-huggingface"
+            - name: DEFAULT_VECTORIZER_MODULE
+              value: "text2vec-huggingface"
+            - name: HUGGINGFACE_APIKEY
+              value: "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"
+            - name: CLUSTER_HOSTNAME
+              value: "node1"
+            - name: LIMIT_RESOURCES
+              value: "true"
+          resources:
+            limits:
+              cpu: "750m"
+              memory: "2500Mi"
+            requests:
+              cpu: "500m"
+              memory: "1000Mi"
+          volumeMounts:
+            - name: weaviate-data
+              mountPath: /var/lib/weaviate
+      volumes:
+        - name: weaviate-data
+          persistentVolumeClaim:
+            claimName: weaviate-pvc

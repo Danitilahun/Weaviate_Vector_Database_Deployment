@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: weaviate-config
+data:
+  QUERY_DEFAULTS_LIMIT: "25"
+  AUTHENTICATION_OIDC_ENABLED: "false"
+  AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "false"
+  ENABLE_MODULES: "text2vec-huggingface"
+  DEFAULT_VECTORIZER_MODULE: "text2vec-huggingface"
+  CLUSTER_HOSTNAME: "node1"
+  LIMIT_RESOURCES: "true"

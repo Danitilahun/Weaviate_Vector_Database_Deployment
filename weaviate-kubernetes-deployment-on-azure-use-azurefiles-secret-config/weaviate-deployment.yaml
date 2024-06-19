@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weaviate
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: weaviate
+  template:
+    metadata:
+      labels:
+        app: weaviate
+    spec:
+      containers:
+        - name: weaviate
+          # image: acrweaviatvectoredb.azurecr.io/weaviate:1.24.10
+          image: cr.weaviate.io/semitechnologies/weaviate:1.24.10
+          ports:
+            - containerPort: 8080
+            - containerPort: 50051
+          envFrom:
+            - configMapRef:
+                name: weaviate-config
+            - secretRef:
+                name: weaviate-auth-secret
+          resources:
+            limits:
+              cpu: "750m"
+              memory: "2500Mi"
+            requests:
+              cpu: "500m"
+              memory: "1000Mi"
+          volumeMounts:
+            - mountPath: "/mnt/azure"
+              name: azurefile
+      volumes:
+        - name: azurefile
+          persistentVolumeClaim:
+            claimName: azurefile-pvc
